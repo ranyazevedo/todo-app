@@ -5,11 +5,13 @@
       :key="task"
       class="bg-white my-3 p-2 flex items-center justify-between rounded border-l-4"
       :style="{ 'border-color': task.color }"
+      data-test="list-item"
     >
       <div class="text-left basis-2/3">
         <span
           class="bg-amber-500 text-white text-xs px-2 rounded-lg"
           v-if="task.priority"
+          data-test="item-priority"
         >
           Priority
         </span>
@@ -20,6 +22,7 @@
         <button
           class="text-white text-sm rounded-sm py-1 px-2 mx-1"
           @click="$emit('openEditModal', task)"
+          data-test="task-edit"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -39,6 +42,7 @@
         <button
           class="text-white text-sm rounded-sm py-1 px-2 mx-1"
           @click="$emit('remove', task.id)"
+          data-test="task-remove"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

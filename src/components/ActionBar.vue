@@ -2,13 +2,14 @@
   <div
     class="flex max-w-lg w-full m-auto my-5 items-center justify-between bg-white p-3 rounded-sm"
   >
-    <p>Total tasks: {{ listLength }}</p>
+    <p data-test="list-length">Total tasks: {{ listLength }}</p>
     <div>
       <CustomButton
         text="New task"
         bgStyle="bg-sky-700"
         textStyle="text-white"
         @click.prevent="$emit('showAddModal')"
+        data-test="add-new-task"
       />
       <CustomButton
         text="Delete all"
@@ -16,6 +17,7 @@
         textStyle="text-white"
         @click.prevent="$emit('removeList')"
         :disabled="disableDeleteBtn"
+        data-test="remove-all-tasks"
       />
     </div>
   </div>

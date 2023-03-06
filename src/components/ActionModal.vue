@@ -6,7 +6,12 @@
     ></div>
     <div class="w-full max-w-lg relative m-auto shadow-lg flex h-screen">
       <div class="bg-white p-3 m-auto rounded-xl w-full">
-        <p class="font-mono text-2xl mb-5 font-bold mt-5">{{ title }}</p>
+        <p
+          class="font-mono text-2xl mb-5 font-bold mt-5"
+          data-test="modal-title"
+        >
+          {{ title }}
+        </p>
         <form>
           <div class="my-4">
             <input
@@ -67,7 +72,7 @@
 </template>
     
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import CustomButton from "./CustomButton.vue";
 
@@ -80,27 +85,27 @@ export default {
     title: String,
     task: {
       id: String,
-      description: String,
-      color: String,
-      priority: Boolean,
       date: String,
+      color: String,
+      description: String,
+      priority: Boolean,
     },
   },
   setup(props, context) {
-    const id = ref('');
-    const date= ref('');
-    const color = ref('');
-    const description = ref('');
+    const id = ref("");
+    const date = ref("");
+    const color = ref("");
+    const description = ref("");
     const priority = ref(false);
 
-    const store = useStore()
+    const store = useStore();
     const getLastTask = computed(() => store.getters.getTaskLast);
 
     const isSubmitDisabled = computed(() => {
       return !description.value || !color.value || !date.value;
     });
 
-    const saveTask = function() {
+    const saveTask = function () {
       const updatedTask = {
         id: props.task ? props.task.id : createTaskId(),
         description: description.value,
@@ -111,7 +116,7 @@ export default {
       context.emit("save", updatedTask);
     };
 
-    const createTaskId = function() {
+    const createTaskId = function () {
       if (typeof getLastTask.value !== "undefined") {
         return getLastTask.value.id + 1;
       }
@@ -119,23 +124,23 @@ export default {
     };
 
     onMounted(() => {
-        if (props.task) {
+      if (props.task) {
         description.value = props.task.description;
         color.value = props.task.color;
         priority.value = props.task.priority;
         date.value = props.task.date;
-        }
+      }
     });
 
     return {
-        id,
-        date,
-        color, 
-        description, 
-        priority,
-        saveTask,
-        isSubmitDisabled
-    }
+      id,
+      date,
+      color,
+      description,
+      priority,
+      saveTask,
+      isSubmitDisabled,
+    };
   },
 };
 </script>
