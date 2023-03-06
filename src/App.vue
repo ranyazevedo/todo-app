@@ -1,6 +1,5 @@
 <template>
   <div class="bg-violet-50 text-center p-3 min-h-screen">
-
     <ActionModal
       title="Add new task"
       @close-modal="showAddModal = false"
@@ -22,19 +21,27 @@
       <SearchInput v-model="searchTask" />
     </div>
 
-    <ToDoList :data="filteredData" @show-edit-modal="openEditModal" @remove-task="taskRemove"/>
+    <ToDoList
+      :data="filteredData"
+      @open-edit-modal="openEditModal"
+      @remove="taskRemove"
+    />
 
     <ActionBar
       :listLength="getTaskList.length"
-      :disableDeleteBtn="!filteredData.length || filteredData.length !== getTaskList.length"
+      :disableDeleteBtn="
+        !filteredData.length || filteredData.length !== getTaskList.length
+      "
       @show-add-modal="showAddModal = true"
-      @remove-list="removeTaskList"
+      @remove-list="removeList"
     />
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { ref, computed } from "vue";
+import { useStore } from "vuex";
+
 import ToDoList from "@/components/ToDoList.vue";
 import SearchInput from "@/components/SearchInput.vue";
 import ActionBar from "@/components/ActionBar.vue";
@@ -48,45 +55,68 @@ export default {
     SearchInput,
     ActionBar,
   },
-  data() {
-    return {
-      showAddModal: false,
-      showEditModal: false,
-      searchTask: "",
-      taskClicked: {}
-    };
-  },
-  computed: {
-    ...mapGetters(["getTaskList"]),
-    filteredData() {
-      return this.getTaskList.filter((item) =>
-        item.description.toLowerCase().includes(this.searchTask.toLowerCase())
+  emits: ["remove", "openEditModal"],
+  setup() {
+    const showAddModal = ref(false);
+    const showEditModal = ref(false);
+    const searchTask = ref("");
+    const taskClicked = ref({});
+
+    const store = useStore();
+    const getTaskList = computed(() => store.getters.getTaskList);
+    const getTaskLast = computed(() => store.getters.getTaskLast);
+
+    const filteredData = computed(() => {
+      return getTaskList.value.filter((item) =>
+        item.description.toLowerCase().includes(searchTask.value.toLowerCase())
       );
-    },
-  }, 
-  methods: {
-    ...mapActions(["removeTaskList", "addTask", "editTask", "removeTask"]),
-    taskAdd(task) {
-      this.addTask(task);
-      this.showAddModal = false;
-    },
-    taskEdit(task) {
-      this.editTask(task);
-      this.showEditModal = false;
-    },
-    taskRemove(taskId) {
-      this.removeTask(taskId);
-    },
-    openEditModal(task) {
-      this.showEditModal = true;
-      this.taskClicked = task;
-    },
-    createTaskId() {
-      if (typeof this.getTaskLast !== "undefined") {
-        return this.getTaskLast.id + 1;
+    });
+
+    const taskAdd = function (task) {
+      store.dispatch("addTask", task);
+      showAddModal.value = false;
+    };
+
+    const taskEdit = function (task) {
+      store.dispatch("editTask", task);
+      showEditModal.value = false;
+    };
+
+    const taskRemove = function (taskId) {
+      store.dispatch("removeTask", taskId);
+    };
+
+    const removeList = function () {
+      store.dispatch("removeTaskList");
+    };
+
+    const openEditModal = function (task) {
+      showEditModal.value = true;
+      taskClicked.value = task;
+    };
+
+    const createTaskId = function () {
+      if (typeof getTaskLast.value !== "undefined") {
+        return getTaskLast.value.id + 1;
       }
       return 1;
-    },
-  }
+    };
+
+    return {
+      showAddModal,
+      showEditModal,
+      searchTask,
+      taskClicked,
+      getTaskList,
+      filteredData,
+      taskAdd,
+      taskEdit,
+      taskRemove,
+      openEditModal,
+      createTaskId,
+      removeList,
+      getTaskLast,
+    };
+  },
 };
 </script>

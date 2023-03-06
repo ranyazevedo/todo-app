@@ -8,11 +8,14 @@
 </template>
   
 <script>
+import { ref } from "vue";
+
 export default {
   name: "SearchInput",
-  data() {
+  setup() {
+    const searchTask = ref("");
     return {
-      searchTask: "",
+      searchTask,
     };
   },
 };

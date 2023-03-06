@@ -19,7 +19,7 @@
       <div class="min-w-xs">
         <button
           class="text-white text-sm rounded-sm py-1 px-2 mx-1"
-          @click="$emit('showEditModal', task)"
+          @click="$emit('openEditModal', task)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +38,7 @@
         </button>
         <button
           class="text-white text-sm rounded-sm py-1 px-2 mx-1"
-          @click="$emit('removeTask', task.id)"
+          @click="$emit('remove', task.id)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -67,5 +67,6 @@ export default {
   props: {
     data: Object,
   },
+  emits: ['remove', 'openEditModal']
 };
 </script>

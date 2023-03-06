@@ -66,23 +66,15 @@
   </div>
 </template>
     
-    <script>
-import { mapGetters, mapActions } from "vuex";
+<script>
+import { ref, computed, onMounted } from 'vue';
+import { useStore } from "vuex";
 import CustomButton from "./CustomButton.vue";
 
 export default {
   name: "ActionModal",
   components: {
     CustomButton,
-  },
-  data() {
-    return {
-      id: "",
-      description: "",
-      color: "",
-      priority: false,
-      date: "",
-    };
   },
   props: {
     title: String,
@@ -94,38 +86,56 @@ export default {
       date: String,
     },
   },
-  computed: {
-    ...mapGetters(["getTaskLast"]),
-    isSubmitDisabled() {
-      return !this.description || !this.color || !this.date;
-    },
-  },
-  mounted() {
-    if (this.task) {
-      this.description = this.task.description;
-      this.color = this.task.color;
-      this.priority = this.task.priority;
-      this.date = this.task.date;
-    }
-  },
-  methods: {
-    ...mapActions(["addTask"]),
-    saveTask() {
-      const task = {
-        id: this.task ? this.task.id : this.createTaskId(),
-        description: this.description,
-        color: this.color,
-        priority: this.priority,
-        date: this.date,
+  setup(props, context) {
+    const id = ref('');
+    const date= ref('');
+    const color = ref('');
+    const description = ref('');
+    const priority = ref(false);
+
+    const store = useStore()
+    const getLastTask = computed(() => store.getters.getTaskLast);
+
+    const isSubmitDisabled = computed(() => {
+      return !description.value || !color.value || !date.value;
+    });
+
+    const saveTask = function() {
+      const updatedTask = {
+        id: props.task ? props.task.id : createTaskId(),
+        description: description.value,
+        color: color.value,
+        priority: priority.value,
+        date: date.value,
       };
-      this.$emit("save", task);
-    },
-    createTaskId() {
-      if (typeof this.getTaskLast !== "undefined") {
-        return this.getTaskLast.id + 1;
+      context.emit("save", updatedTask);
+    };
+
+    const createTaskId = function() {
+      if (typeof getLastTask.value !== "undefined") {
+        return getLastTask.value.id + 1;
       }
       return 1;
-    },
+    };
+
+    onMounted(() => {
+        if (props.task) {
+        description.value = props.task.description;
+        color.value = props.task.color;
+        priority.value = props.task.priority;
+        date.value = props.task.date;
+        }
+    });
+
+    return {
+        id,
+        date,
+        color, 
+        description, 
+        priority,
+        saveTask,
+        isSubmitDisabled
+    }
   },
 };
 </script>
